@@ -25,12 +25,12 @@ class mariadb:
         self.commit()
         return cursor.fetchone()
 
-    def check_permissions(self, channel, user):
+    def get_status(self, user):
         with self.db.cursor() as cursor:
-            sql="UPDATE users SET points=points+1 WHERE discord_id=%s"
-            cursor.execute(sql, (user_id,))
+            sql="SELECT status FROM users WHERE discord_id=%s"
+            cursor.execute(sql, (user,))
         self.commit()
-        return cursor.fetchone()
+        return cursor.fetchone()[0]
 
 
     def give_coin(self, user_id):
