@@ -1,6 +1,5 @@
 from discord import Embed
 import random
-import shadowDB as database
 
 def doge(message):
     """

@@ -1,5 +1,4 @@
 import pymysql
-from functools import wraps
 
 class mariadb:
     def __init__(self, user, password):
