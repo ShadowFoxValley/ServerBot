@@ -32,10 +32,15 @@ class mariadb:
         self.commit()
         return cursor.fetchone()[0]
 
-
     def give_coin(self, user_id):
         with self.db.cursor() as cursor:
             sql="UPDATE users SET points=points+1 WHERE discord_id=%s"
             cursor.execute(sql, (user_id,))
         self.commit()
         return cursor.fetchone()
+
+    def  new_user(self, member):
+        with self.db.cursor() as cursor:
+            sql="INSERT INTO users (discord_id, username) VALUES (%s, %s)"
+            cursor.execute(sql, (member.id, member.name))
+        self.commit()

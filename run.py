@@ -15,6 +15,12 @@ token=settings[1]
 commands=["test", "setprefix", "doge", "help"]
 
 @client.event
+async def on_member_join(member):
+    global mariadb
+    print("New user - {}".format(member.name))
+    mariadb.new_user(member)
+
+@client.event
 async def on_message(message):
     global prefix, mariadb, commands
 
@@ -29,7 +35,6 @@ async def on_message(message):
 
     if user_status==0:
         return
-
 
     if message_text.split(" ")[0].replace(prefix, "") in commands:
 
