@@ -58,6 +58,7 @@ class mariadb:
             sql="INSERT INTO users (discord_id, username) VALUES (%s, %s)"
             cursor.execute(sql, (member.id, member.name))
         self.commit()
+
     def get_points(self, user_id):
         """
         Получить поинты пользователя из базы данных
@@ -66,3 +67,13 @@ class mariadb:
             sql = "SELECT points FROM users WHERE discord_id=%s"
             cursor.execute(sql, (user_id,))
         return cursor.fetchone()[0]
+
+    def get_top(self):
+        """
+        Получение топ-10
+        """
+        with self.db.cursor() as cursor:
+            sql="SELECT username, points FROM users ORDER BY points DESC LIMIT 10"
+            cursor.execute(sql)
+        self.commit()
+        return cursor.fetchall()
