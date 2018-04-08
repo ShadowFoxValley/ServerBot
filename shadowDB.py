@@ -66,4 +66,4 @@ class mariadb:
         with self.db.cursor() as cursor:
             sql = "SELECT points FROM users WHERE discord_id=%s"
             cursor.execute(sql, (user_id,))
-        return cursor.fetcnone()
+        return cursor.fetchone()
