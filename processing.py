@@ -25,18 +25,16 @@ def help(author, prefix):
     embed.set_author(name = str(author.name), icon_url = str(author.avatar_url))
     embed.set_thumbnail(url = "https://happycoin.club/wp-content/uploads/2017/05/dogecoin_2.png")
 
-    embed.add_field(name = "%sdoge" % (prefix), value = "Получить порцию доге", inline = True)
-    embed.add_field(name = "%spoints" % (prefix), value = "Посчитать шекели в кошельке", inline = True)
+    embed.add_field(name = "%sdoge" % (prefix), value = "Получить порцию доге", inline = False)
+    embed.add_field(name = "%spoints" % (prefix), value = "Посчитать шекели в кошельке")
     return ["embed", embed]
 
-def points(author):
+def points(author, points):
     """
     Посчитать поинты пользователя.
     """
-    id = author.id
-    points = database.get_points(id)
 
     embed = Embed(color = 0x00ff00)
     embed.set_author(name = str(author.name), icon_url = str(author.avatar_url))
-    embed.add_field(name = "Шекели", value = str(points), inline = true)
+    embed.add_field(name = "Шекели", value = str(points), inline = True)
     return ["embed", embed]

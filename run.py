@@ -54,10 +54,10 @@ async def on_message(message):
                 result=processing.doge(message)
 
             elif command=="help":
-                result=processing.help(message.author, prefix)
+                result=processing.help(client.user, prefix)
 
             elif command=="points":
-                result = processing.points(message.author)
+                result = processing.points(message.author, mariadb.get_points(message.author.id))
 
         if result[0]=="embed":
             # Send embed message
