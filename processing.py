@@ -5,8 +5,8 @@ def doge(message):
     """
     Доге
     """
-    permits=["bots", "programming", "botk"]
-    if message.channel.name not in permits: return;
+    permits=["374914059679694848", "421637061787779072", "431897105163091979"]
+    if message.channel.id not in permits: return;
 
     embed = Embed(color = 0x00ff00)
     embed.set_author(name = str(message.author.name), icon_url = str(message.author.avatar_url))
