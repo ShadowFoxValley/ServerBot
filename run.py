@@ -12,7 +12,7 @@ settings=mariadb.get_settings()
 prefix=settings[0]
 token=settings[1]
 
-commands=["test", "setprefix", "doge", "help", "points"]
+commands=["test", "setprefix", "doge", "help", "points", "top"]
 
 @client.event
 async def on_member_join(member):
@@ -58,6 +58,9 @@ async def on_message(message):
 
             elif command=="points":
                 result = processing.points(message.author, mariadb.get_points(message.author.id))
+
+            elif command=="top":
+                result = processing.get_top_list(message.author, mariadb.get_top())
 
         if result[0]=="embed":
             # Send embed message
