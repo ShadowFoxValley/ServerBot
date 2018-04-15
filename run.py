@@ -1,10 +1,7 @@
 import discord
-import shadowDB as database
 import processing
 
 client = discord.Client()
-
-commands=["test", "setprefix", "doge", "help", "points", "top"]
 
 @client.event
 async def on_member_join(member):
@@ -32,6 +29,9 @@ async def on_message(message):
 
     if user_status==0:
         return
+
+
+    commands=["test", "setprefix", "doge", "help", "points", "top"]
 
     if message_text.split(" ")[0].replace(prefix, "") in commands:
 
