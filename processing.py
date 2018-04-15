@@ -1,6 +1,50 @@
 from discord import Embed
 import random
 
+import shadowDB as database
+
+db_user="discord"
+db_pass="truePass"
+mariadb=database.mariadb(db_user, db_pass)
+
+"""
+
+Служебные команды
+Триггерятся от админов или от тела программы
+
+"""
+
+def get_settings():
+    global mariadb
+    settings=mariadb.get_settings()
+    return settings
+
+def give_coin(message):
+    global mariadb
+    mariadb.give_coin(message.author.id)
+
+
+def set_prefix(new_prefix):
+    """
+    Установка нового префикса
+    """
+    global mariadb
+    mariadb.set_prefix(new_prefix)
+
+def get_status(user_id):
+    global mariadb
+    status = mariadb.get_status(user_id)
+    return status
+
+
+"""
+
+    Команды для плебеев
+    Могут использовать все
+
+"""
+
+
 def doge(message):
     """
     Доге
@@ -16,6 +60,7 @@ def doge(message):
 
     return ["embed", embed]
 
+
 def help(author, prefix):
     """
     Справка по командам
@@ -30,20 +75,29 @@ def help(author, prefix):
             ).format(prefix), inline = False)
     return ["embed", embed]
 
-def points(author, points):
+
+
+def points(author):
     """
     Посчитать поинты пользователя.
     """
+    global mariadb
+    points = mariadb.get_points(author.id)
+
 
     embed = Embed(color = 0x00ff00)
     embed.set_author(name = str(author.name), icon_url = str(author.avatar_url))
-    embed.add_field(name = "Догекоины", value = str(points), inline = True)
+    embed.add_field(name = "Статистика", value = "{0} догекойнов\n{1} место в топе".format(str(points[0]), str(points[1])), inline = True)
     return ["embed", embed]
 
-def get_top_list(author, users):
+
+
+def get_top_list(author):
     """
     Получить топ пользователей
     """
+    global mariadb
+    users=mariadb.get_top()
 
     embed = Embed(color=0x00ff00)
     embed.set_author(name=str(author.name), icon_url=str(author.avatar_url))

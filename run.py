@@ -4,14 +4,6 @@ import processing
 
 client = discord.Client()
 
-db_user="discord"
-db_pass="truePass"
-mariadb=database.mariadb(db_user, db_pass)
-
-settings=mariadb.get_settings()
-prefix=settings[0]
-token=settings[1]
-
 commands=["test", "setprefix", "doge", "help", "points", "top"]
 
 @client.event
@@ -30,8 +22,13 @@ async def on_message(message):
     user_id = message.author.id
     channel = message.channel
     message_text = message.content
-    user_status = int(mariadb.get_status(message.author.id))
 
+
+    """
+    # TODO:
+            Убрать user_status. Заменить на нормальные права доступа для разграничения.
+    """
+    user_status = int(processing.get_status(message.author.id))
 
     if user_status==0:
         return
@@ -46,7 +43,7 @@ async def on_message(message):
 
             if command=="setprefix":
                 prefix=message.content.split(" ")[1]
-                mariadb.set_prefix(prefix)
+                processing.set_prefix(prefix)
                 result=["text", "Префикс изменен на ``%s``"%(prefix)]
 
         if user_status>=1:
@@ -57,11 +54,17 @@ async def on_message(message):
                 result=processing.help(client.user, prefix)
 
             elif command=="points":
-                result = processing.points(message.author, mariadb.get_points(message.author.id))
+                result = processing.points(message.author)
 
             elif command=="top":
-                result = processing.get_top_list(message.author, mariadb.get_top())
+                result = processing.get_top_list(message.author)
 
+
+        """
+
+            Отправка данных из переменной result
+
+        """
         if result[0]=="embed":
             # Send embed message
             await client.send_message(message.channel, embed=result[1])
@@ -74,11 +77,18 @@ async def on_message(message):
             # Send file
             await client.send_file(message.channel, result[1])
 
-
     else:
-        msg = await client.wait_for_message(timeout=float(5), author=message.author)
+        """
+
+            Если сообщение не является командой, то начислить балл.
+            Имеется кд на 7 секунд против Скорча.
+            Клиент ждет сообщение от пользователя. Если пришло в течении 7 секунд - сбросить кд и не начислять
+            Если прошло 7 секунд и сообщения от пользователя нет - начислить балл.
+
+        """
+        msg = await client.wait_for_message(timeout=float(7), author=message.author)
         if msg==None:
-            mariadb.give_coin(message.author.id)
+            processing.give_coin(message)
 
 
 @client.event
@@ -88,5 +98,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
+prefix, token = processing.get_settings()
 
 client.run(token)

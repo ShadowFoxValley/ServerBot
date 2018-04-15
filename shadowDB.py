@@ -61,12 +61,18 @@ class mariadb:
 
     def get_points(self, user_id):
         """
-        Получить поинты пользователя из базы данных
+        Получить поинты пользователя из базы данных и его место
         """
         with self.db.cursor() as cursor:
-            sql = "SELECT points FROM users WHERE discord_id=%s"
-            cursor.execute(sql, (user_id,))
-        return cursor.fetchone()[0]
+            sql = "SELECT points, discord_id FROM users ORDER BY points DESC"
+            cursor.execute(sql)
+        users=cursor.fetchall()
+
+        count=1
+        for user in users:
+            if str(user[1])==str(user_id):
+                return [user[0], count]
+            count+=1
 
     def get_top(self):
         """
