@@ -3,17 +3,29 @@ import processing
 
 client = discord.Client()
 
+
+
+"""
+    Без try выкидывает в логи ошибку discord.errors.HTTPException: BAD REQUEST (status code: 400)
+    Решения адекватного не нашел
+"""
+
 @client.event
 async def on_message_delete(message):
-    if message.channel.id=="421637061787779072":
-        await client.send_message(message.channel, embed=processing.make_deleted_message(message))
+    if int(processing.get_status(message.author.id))==2:
+        return
+
+    try:
+        if message.channel.id=="421637061787779072":
+            await client.send_message(message.channel, embed=processing.make_deleted_message(message))
+    except Exception as e:
+        pass
 
 @client.event
 async def on_message_edit(before, after):
-    """
-        Без try выкидывает в логи ошибку discord.errors.HTTPException: BAD REQUEST (status code: 400)
-        Мне не нравится
-    """
+    if int(processing.get_status(before.author.id))==2:
+        return
+
     try:
         if before.channel.id=="421637061787779072":
             await client.send_message(before.channel, embed=processing.make_edited_message(before, after))
@@ -23,7 +35,7 @@ async def on_message_edit(before, after):
 @client.event
 async def on_member_join(member):
     print("New user - {}".format(member.name))
-    mariadb.new_user(member)
+    processing.new_user(member)
 
 @client.event
 async def on_message(message):

@@ -36,6 +36,19 @@ def get_status(user_id):
     status = mariadb.get_status(user_id)
     return status
 
+def make_deleted_message(message):
+    embed = Embed(color = 0x284fb5)
+    embed.set_author(name = str(message.author.name), icon_url = str(message.author.avatar_url))
+    embed.add_field(name = "Удаленное сообщение", value = message.content, inline = False)
+    return embed
+
+def make_edited_message(before, after):
+    embed = Embed(color = 0x284fb5)
+    embed.set_author(name = str(before.author.name), icon_url = str(before.author.avatar_url))
+    embed.add_field(name = "Было", value = before.content, inline = False)
+    embed.add_field(name = "Стало", value = after.content, inline = False)
+    return embed
+
 
 """
 
