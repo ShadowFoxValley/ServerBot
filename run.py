@@ -4,17 +4,12 @@ import processing
 client = discord.Client()
 
 
-
 """
     Без try выкидывает в логи ошибку discord.errors.HTTPException: BAD REQUEST (status code: 400)
     Решения адекватного не нашел
 """
-
 @client.event
 async def on_message_delete(message):
-    if int(processing.get_status(message.author.id))==2:
-        return
-
     try:
         if message.channel.id=="421637061787779072":
             await client.send_message(message.channel, embed=processing.make_deleted_message(message))
@@ -23,9 +18,6 @@ async def on_message_delete(message):
 
 @client.event
 async def on_message_edit(before, after):
-    if int(processing.get_status(before.author.id))==2:
-        return
-
     try:
         if before.channel.id=="421637061787779072":
             await client.send_message(before.channel, embed=processing.make_edited_message(before, after))

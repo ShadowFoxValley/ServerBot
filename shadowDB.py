@@ -35,10 +35,13 @@ class mariadb:
         Получение статуса пользователя из базы данных
         """
         with self.db.cursor() as cursor:
-            sql="SELECT status FROM users WHERE discord_id=%s"
+            sql="SELECT status FROM users WHERE discord_id=%s LIMIT 1"
             cursor.execute(sql, (user_id,))
         self.commit()
-        return cursor.fetchone()[0]
+
+        result=cursor.fetchall()
+        #print(result)
+        return result[0][0]
 
     def give_coin(self, user_id):
         """
