@@ -82,7 +82,7 @@ class mariadb:
         Получение топ-10
         """
         with self.db.cursor() as cursor:
-            sql="SELECT username, points FROM users ORDER BY points DESC LIMIT 10"
+            sql="SELECT username, points FROM users ORDER BY points DESC LIMIT 9"
             cursor.execute(sql)
         self.commit()
         return cursor.fetchall()
