@@ -50,6 +50,9 @@ async def on_message(message):
     if user_status==0:
         return
 
+    if message.content.startswith("#event") and message.channel.id=="435792312778489856":
+        msg=message.author.name+": **"+message.content.replace("#event","")+"**"
+        await client.send_message(client.get_channel("435883270945898496"), msg)
 
     commands=["test", "setprefix", "doge", "help", "points", "top"]
 
