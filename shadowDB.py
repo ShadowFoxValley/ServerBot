@@ -33,15 +33,21 @@ class mariadb:
     def get_status(self, user_id):
         """
         Получение статуса пользователя из базы данных
-        """
-        with self.db.cursor() as cursor:
-            sql="SELECT status FROM users WHERE discord_id=%s LIMIT 1"
-            cursor.execute(sql, (user_id,))
-        self.commit()
 
-        result=cursor.fetchall()
-        #print(result)
-        return result[0][0]
+        Не знаю почему падает. Оно меня бесит.
+        Вроде все данные приходят, но иногда просто получаем пустой массив в курсор.
+        """
+        try:
+            with self.db.cursor() as cursor:
+                sql="SELECT status FROM users WHERE discord_id=%s LIMIT 1"
+                cursor.execute(sql, (user_id,))
+            self.commit()
+
+            result=cursor.fetchall()
+            return result[0][0]
+        except Exception as e:
+            return 1
+
 
     def give_coin(self, user_id):
         """

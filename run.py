@@ -18,6 +18,9 @@ async def on_message_delete(message):
 
 @client.event
 async def on_message_edit(before, after):
+    if before.content==after.content:
+        return
+
     try:
         if before.channel.id=="421637061787779072":
             await client.send_message(before.channel, embed=processing.make_edited_message(before, after))
@@ -29,9 +32,12 @@ async def on_member_join(member):
     print("New user - {}".format(member.name))
     processing.new_user(member)
 
+
+last_users=["null" for i in range(5)]
+
 @client.event
 async def on_message(message):
-    global prefix, mariadb, commands
+    global prefix, mariadb, commands, last_users
 
     if message.author == client.user:
         return
@@ -50,12 +56,32 @@ async def on_message(message):
     if user_status==0:
         return
 
+
+
+    """
+
+        Event block
+
+    """
+
+
     if message.content.startswith("#event") and message.channel.id=="435792312778489856":
-        msg=message.author.name+": **"+message.content.replace("#event","")+"**"
-        await client.send_message(client.get_channel("435883270945898496"), msg)
+        if message.author.name in last_users:
+            msg="%s, подожди пока 5 человек что-то напишут"%(message.author.mention)
+            await client.send_message(message.channel, msg)
+        else:
+            last_users.insert(0, message.author.name)
+            del last_users[5]
+            msg="**"+message.author.name+"**: "+message.content.replace("#event","")
+            await client.send_message(client.get_channel("435883270945898496"), msg)
 
-    commands=["test", "setprefix", "doge", "help", "points", "top"]
+    """
 
+        Command block
+
+    """
+
+    commands=["test", "setprefix", "doge", "help", "points", "top", "wait"]
     if message_text.split(" ")[0].replace(prefix, "") in commands:
 
         command=message_text.split(" ")[0].replace(prefix, "")
@@ -81,6 +107,14 @@ async def on_message(message):
 
             elif command=="top":
                 result = processing.get_top_list(message.author)
+
+            elif command=="wait":
+                queue="Вы пока что не можете писать историю:"
+                counter=1
+                for user in last_users:
+                    queue+="\n%d) %s"%(counter, user)
+                    counter+=1
+                result=["text", queue]
 
 
         """
