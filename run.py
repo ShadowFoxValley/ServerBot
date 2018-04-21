@@ -52,15 +52,6 @@ async def on_message(message):
     message_text = message.content
 
     """
-    # TODO:
-            Убрать user_status. Заменить на нормальные права доступа для разграничения.
-    """
-    user_status = int(processing.get_status(user.id))
-
-    if user_status == 0:
-        return
-
-    """
 
         Event block
 
@@ -73,7 +64,7 @@ async def on_message(message):
         else:
             last_users.insert(0, user.name)
             del last_users[5]
-            msg = "**" + user.name+"**: " + message.content.replace("#event", "")
+            msg = "**" + user.name + "**: " + message.content.replace("#event", "")
             await client.send_message(client.get_channel("435883270945898496"), msg)
 
     """
@@ -87,29 +78,27 @@ async def on_message(message):
 
         command = message_text.split(" ")[0].replace(prefix, "")
 
-        if user_status == 2:
-            if command == "test":
+        if command == "test":
                 result = ["text", '{}, приветики'.format(user.mention)]
 
-            if command == "setprefix":
+        elif command == "setprefix":
                 prefix = message.content.split(" ")[1]
-                processing.set_prefix(prefix)
+                processing.set_prefix(user, prefix)
                 result = ["text", "Префикс изменен на ``%s``" % prefix]
 
-        if user_status >= 1:
-            if command == "doge":
-                result = processing.doge(message)
+        elif command == "doge":
+                result = processing.doge(user, message)
 
-            elif command == "help":
-                result = processing.help_command(client.user, prefix)
+        elif command == "help":
+                result = processing.help_command(client.user, user, prefix)
 
-            elif command == "points":
+        elif command == "points":
                 result = processing.points(user)
 
-            elif command == "top":
+        elif command == "top":
                 result = processing.get_top_list(user)
 
-            elif command == "wait":
+        elif command == "wait":
                 queue = "Вы пока что не можете писать историю:"
                 counter = 1
                 for user in last_users:
@@ -122,17 +111,20 @@ async def on_message(message):
             Отправка данных из переменной result
 
         """
-        if result[0] == "embed":
+        if result is None:
+            pass
+        else:
+            if result[0] == "embed":
             # Send embed message
-            await client.send_message(message.channel, embed=result[1])
+                await client.send_message(message.channel, embed=result[1])
 
-        elif result[0] == "text":
+            elif result[0] == "text":
             # Send text
-            await client.send_message(channel, result[1])
+                await client.send_message(channel, result[1])
 
-        elif result[0] == "file":
+            elif result[0] == "file":
             # Send file
-            await client.send_file(channel, result[1])
+                await client.send_file(channel, result[1])
 
     else:
         """

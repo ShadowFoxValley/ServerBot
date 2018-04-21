@@ -1,5 +1,6 @@
 from discord import Embed
 import random
+from permissions import check_permission
 
 import shadowDB as database
 
@@ -24,12 +25,13 @@ def give_coin(message):
     mariadb.give_coin(message.author.id)
 
 
-def set_prefix(new_prefix):
+def set_prefix(user, new_prefix):
     """
     Установка нового префикса
     """
     global mariadb
-    mariadb.set_prefix(new_prefix)
+    if check_permission(get_status(user.id), "setprefix"):
+        mariadb.set_prefix(new_prefix)
 
 
 def get_status(user_id):
@@ -64,12 +66,14 @@ def new_user(member):
 """
 
 
-def doge(message):
+def doge(user, message):
     """
     Доге
     """
     permits = ["374914059679694848", "421637061787779072", "431897105163091979"]
     if message.channel.id not in permits:
+        return
+    if not check_permission(get_status(user.id), "doge"):
         return
 
     embed = Embed(color=0x00ff00)
@@ -82,17 +86,21 @@ def doge(message):
     return ["embed", embed]
 
 
-def help_command(author, prefix):
+def help_command(bot, user, prefix):
     """
     Справка по командам
     """
+    if not check_permission(get_status(user.id), "help"):
+        return
+
     embed = Embed(color=0x00ff00)
-    embed.set_author(name=str(author.name), icon_url=str(author.avatar_url))
+    embed.set_author(name=str(bot.name), icon_url=str(bot.avatar_url))
     embed.set_thumbnail(url="https://happycoin.club/wp-content/uploads/2017/05/dogecoin_2.png")
 
     embed.add_field(name="Забавы",
                     value=("`{0}doge`- получить порцию доге\n"
                            "`{0}points` - посчитать догекоины в кошельке"
+                           "`{0}top` - получить топ богачей"
                            ).format(prefix),
                     inline=False
                     )
@@ -103,6 +111,9 @@ def points(author):
     """
     Посчитать поинты пользователя.
     """
+    if not check_permission(get_status(author.id), "points"):
+        return
+
     global mariadb
     points = mariadb.get_points(author.id)
 
@@ -116,6 +127,9 @@ def get_top_list(author):
     """
     Получить топ пользователей
     """
+    if not check_permission(get_status(author.id), "top"):
+        return
+
     global mariadb
     users = mariadb.get_top()
 
