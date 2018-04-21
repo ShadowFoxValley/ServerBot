@@ -14,7 +14,7 @@ client = discord.Client()
 async def on_message_delete(message):
     try:
         if message.channel.id == "421637061787779072":
-            await client.send_message(message.channel, embed=processing.make_deleted_message(message))
+            await client.send_message(message.channel, embed=processing.ProcessFunction.make_deleted_message(message))
     except Exception as e:
         pass
 
@@ -26,7 +26,7 @@ async def on_message_edit(before, after):
 
     try:
         if before.channel.id == "421637061787779072":
-            await client.send_message(before.channel, embed=processing.make_edited_message(before, after))
+            await client.send_message(before.channel, embed=processing.ProcessFunction.make_edited_message(before, after))
     except Exception as e:
         pass
 
@@ -34,11 +34,11 @@ async def on_message_edit(before, after):
 @client.event
 async def on_member_join(member):
     print("New user - {}".format(member.name))
-    processing.new_user(member)
+    processing.ProcessFunction.new_user(member)
 
 
+# Необходима для функционирования #event-log
 last_users = ["null" for i in range(5)]
-
 
 @client.event
 async def on_message(message):
@@ -72,6 +72,8 @@ async def on_message(message):
         Command block
 
     """
+    process = processing.ProcessFunction(message)
+
 
     commands = ["test", "setprefix", "doge", "help", "points", "top", "wait"]
     if message_text.split(" ")[0].replace(prefix, "") in commands:
@@ -83,20 +85,21 @@ async def on_message(message):
 
         elif command == "setprefix":
                 prefix = message.content.split(" ")[1]
-                processing.set_prefix(user, prefix)
+                process.set_prefix(prefix)
+
                 result = ["text", "Префикс изменен на ``%s``" % prefix]
 
         elif command == "doge":
-                result = processing.doge(user, message)
+                result = process.doge()
 
         elif command == "help":
-                result = processing.help_command(client.user, user, prefix)
+                result = process.help_command(client.user, prefix)
 
         elif command == "points":
-                result = processing.points(user)
+                result = process.points()
 
         elif command == "top":
-                result = processing.get_top_list(user)
+                result = process.get_top_list(user)
 
         elif command == "wait":
                 queue = "Вы пока что не можете писать историю:"
@@ -137,7 +140,7 @@ async def on_message(message):
         """
         msg = await client.wait_for_message(timeout=float(7), author=user)
         if msg is None:
-            processing.give_coin(message)
+            process.give_coin()
 
 
 @client.event
@@ -147,6 +150,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-prefix, token = processing.get_settings()
+prefix, token = processing.ProcessFunction.get_settings()
 
 client.run(token)
