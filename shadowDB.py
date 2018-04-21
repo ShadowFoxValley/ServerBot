@@ -1,8 +1,9 @@
 import pymysql
 
+
 class mariadb:
     def __init__(self, user, password):
-        self.db=pymysql.connect("localhost", user, password, "discord", charset='utf8')
+        self.db = pymysql.connect("localhost", user, password, "discord", charset='utf8')
 
     def commit(self):
         self.db.commit()
@@ -15,7 +16,7 @@ class mariadb:
         Получение настроек из базы данных.
         """
         with self.db.cursor() as cursor:
-            sql="SELECT * FROM settings"
+            sql = "SELECT * FROM settings"
             cursor.execute(sql)
         self.commit()
         return cursor.fetchone()
@@ -25,7 +26,7 @@ class mariadb:
         Установка нового префикса для команд.
         """
         with self.db.cursor() as cursor:
-            sql="UPDATE settings SET prefix=%s"
+            sql = "UPDATE settings SET prefix=%s"
             cursor.execute(sql, (new_prefix,))
         self.commit()
         return cursor.fetchone()
@@ -39,22 +40,21 @@ class mariadb:
         """
         try:
             with self.db.cursor() as cursor:
-                sql="SELECT status FROM users WHERE discord_id=%s LIMIT 1"
+                sql = "SELECT status FROM users WHERE discord_id=%s LIMIT 1"
                 cursor.execute(sql, (user_id,))
             self.commit()
 
-            result=cursor.fetchall()
+            result = cursor.fetchall()
             return result[0][0]
         except Exception as e:
             return 1
-
 
     def give_coin(self, user_id):
         """
         Выдача коинов пользователю.
         """
         with self.db.cursor() as cursor:
-            sql="UPDATE users SET points=points+1 WHERE discord_id=%s"
+            sql = "UPDATE users SET points=points+1 WHERE discord_id=%s"
             cursor.execute(sql, (user_id,))
         self.commit()
         return cursor.fetchone()
@@ -64,7 +64,7 @@ class mariadb:
         Создание нового пользователя в базе данных.
         """
         with self.db.cursor() as cursor:
-            sql="INSERT INTO users (discord_id, username) VALUES (%s, %s)"
+            sql = "INSERT INTO users (discord_id, username) VALUES (%s, %s)"
             cursor.execute(sql, (member.id, member.name))
         self.commit()
 
@@ -75,20 +75,20 @@ class mariadb:
         with self.db.cursor() as cursor:
             sql = "SELECT points, discord_id FROM users ORDER BY points DESC"
             cursor.execute(sql)
-        users=cursor.fetchall()
+        users = cursor.fetchall()
 
-        count=1
+        count = 1
         for user in users:
-            if str(user[1])==str(user_id):
+            if str(user[1]) == str(user_id):
                 return [user[0], count]
-            count+=1
+            count += 1
 
     def get_top(self):
         """
         Получение топ-10
         """
         with self.db.cursor() as cursor:
-            sql="SELECT username, points FROM users ORDER BY points DESC LIMIT 9"
+            sql = "SELECT username, points FROM users ORDER BY points DESC LIMIT 9"
             cursor.execute(sql)
         self.commit()
         return cursor.fetchall()

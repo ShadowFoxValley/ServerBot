@@ -8,24 +8,28 @@ client = discord.Client()
     Без try выкидывает в логи ошибку discord.errors.HTTPException: BAD REQUEST (status code: 400)
     Решения адекватного не нашел
 """
+
+
 @client.event
 async def on_message_delete(message):
     try:
-        if message.channel.id=="421637061787779072":
+        if message.channel.id == "421637061787779072":
             await client.send_message(message.channel, embed=processing.make_deleted_message(message))
     except Exception as e:
         pass
 
+
 @client.event
 async def on_message_edit(before, after):
-    if before.content==after.content:
+    if before.content == after.content:
         return
 
     try:
-        if before.channel.id=="421637061787779072":
+        if before.channel.id == "421637061787779072":
             await client.send_message(before.channel, embed=processing.make_edited_message(before, after))
     except Exception as e:
         pass
+
 
 @client.event
 async def on_member_join(member):
@@ -33,7 +37,8 @@ async def on_member_join(member):
     processing.new_user(member)
 
 
-last_users=["null" for i in range(5)]
+last_users = ["null" for i in range(5)]
+
 
 @client.event
 async def on_message(message):
@@ -42,21 +47,18 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    user_id = message.author.id
+    user = message.author
     channel = message.channel
     message_text = message.content
-
 
     """
     # TODO:
             Убрать user_status. Заменить на нормальные права доступа для разграничения.
     """
-    user_status = int(processing.get_status(message.author.id))
+    user_status = int(processing.get_status(user.id))
 
-    if user_status==0:
+    if user_status == 0:
         return
-
-
 
     """
 
@@ -64,15 +66,14 @@ async def on_message(message):
 
     """
 
-
-    if message.content.startswith("#event") and message.channel.id=="435792312778489856":
-        if message.author.name in last_users:
-            msg="%s, подожди пока 5 человек что-то напишут"%(message.author.mention)
-            await client.send_message(message.channel, msg)
+    if message.content.startswith("#event") and channel.id == "435792312778489856":
+        if user.name in last_users:
+            msg = "%s, подожди пока 5 человек что-то напишут" % user.mention
+            await client.send_message(channel, msg)
         else:
-            last_users.insert(0, message.author.name)
+            last_users.insert(0, user.name)
             del last_users[5]
-            msg="**"+message.author.name+"**: "+message.content.replace("#event","")
+            msg = "**" + user.name+"**: " + message.content.replace("#event", "")
             await client.send_message(client.get_channel("435883270945898496"), msg)
 
     """
@@ -81,58 +82,57 @@ async def on_message(message):
 
     """
 
-    commands=["test", "setprefix", "doge", "help", "points", "top", "wait"]
+    commands = ["test", "setprefix", "doge", "help", "points", "top", "wait"]
     if message_text.split(" ")[0].replace(prefix, "") in commands:
 
-        command=message_text.split(" ")[0].replace(prefix, "")
+        command = message_text.split(" ")[0].replace(prefix, "")
 
-        if user_status==2:
-            if command=="test":
-                result=["text", '{}, приветики'.format(message.author.mention)]
+        if user_status == 2:
+            if command == "test":
+                result = ["text", '{}, приветики'.format(user.mention)]
 
-            if command=="setprefix":
-                prefix=message.content.split(" ")[1]
+            if command == "setprefix":
+                prefix = message.content.split(" ")[1]
                 processing.set_prefix(prefix)
-                result=["text", "Префикс изменен на ``%s``"%(prefix)]
+                result = ["text", "Префикс изменен на ``%s``" % prefix]
 
-        if user_status>=1:
-            if command=="doge":
-                result=processing.doge(message)
+        if user_status >= 1:
+            if command == "doge":
+                result = processing.doge(message)
 
-            elif command=="help":
-                result=processing.help(client.user, prefix)
+            elif command == "help":
+                result = processing.help_command(client.user, prefix)
 
-            elif command=="points":
-                result = processing.points(message.author)
+            elif command == "points":
+                result = processing.points(user)
 
-            elif command=="top":
-                result = processing.get_top_list(message.author)
+            elif command == "top":
+                result = processing.get_top_list(user)
 
-            elif command=="wait":
-                queue="Вы пока что не можете писать историю:"
-                counter=1
+            elif command == "wait":
+                queue = "Вы пока что не можете писать историю:"
+                counter = 1
                 for user in last_users:
-                    queue+="\n%d) %s"%(counter, user)
-                    counter+=1
-                result=["text", queue]
-
+                    queue += "\n%d) %s" % (counter, user)
+                    counter += 1
+                result = ["text", queue]
 
         """
 
             Отправка данных из переменной result
 
         """
-        if result[0]=="embed":
+        if result[0] == "embed":
             # Send embed message
             await client.send_message(message.channel, embed=result[1])
 
-        elif result[0]=="text":
+        elif result[0] == "text":
             # Send text
-            await client.send_message(message.channel, result[1])
+            await client.send_message(channel, result[1])
 
-        elif result[0]=="file":
+        elif result[0] == "file":
             # Send file
-            await client.send_file(message.channel, result[1])
+            await client.send_file(channel, result[1])
 
     else:
         """
@@ -143,8 +143,8 @@ async def on_message(message):
             Если прошло 7 секунд и сообщения от пользователя нет - начислить балл.
 
         """
-        msg = await client.wait_for_message(timeout=float(7), author=message.author)
-        if msg==None:
+        msg = await client.wait_for_message(timeout=float(7), author=user)
+        if msg is None:
             processing.give_coin(message)
 
 
