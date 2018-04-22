@@ -67,7 +67,6 @@ class ProcessFunction():
         status = mariadb.get_status(self.user.id)
         return status
 
-
     """
         Команды для плебеев
         Могут использовать все
@@ -107,7 +106,7 @@ class ProcessFunction():
 
         embed.add_field(name="Забавы",
                         value=("`{0}doge`- получить порцию доге\n"
-                               "`{0}points` - посчитать догекоины в кошельке"
+                               "`{0}points` - посчитать догекоины в кошельке\n"
                                "`{0}top` - получить топ богачей"
                                ).format(prefix),
                         inline=False
@@ -126,7 +125,7 @@ class ProcessFunction():
         points = mariadb.get_points(self.user.id)
 
         embed = Embed(color=0x00ff00)
-        embed.set_author(name=str(author.name), icon_url=str(author.avatar_url))
+        embed.set_author(name=str(self.user.name), icon_url=str(self.user.avatar_url))
         embed.add_field(name="Статистика", value="{0} догекойнов\n{1} место в топе".format(str(points[0]), str(points[1])), inline = True)
         return ["embed", embed]
 
