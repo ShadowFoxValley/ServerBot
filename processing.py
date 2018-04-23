@@ -1,5 +1,5 @@
 from discord import Embed
-import random
+from random import shuffle, randint
 from permissions import check_permission
 
 import shadowDB as database
@@ -87,8 +87,8 @@ class ProcessFunction():
         embed.set_author(name=str(self.user.name), icon_url=str(self.user.avatar_url))
         lines = [line.rstrip('\n') for line in open('data_lists/dogelist')]
         for i in range(10):
-            random.shuffle(lines)
-        embed.set_image(url=lines[random.randint(0, len(lines)-1)])
+            shuffle(lines)
+        embed.set_image(url=lines[randint(0, len(lines)-1)])
 
         return ["embed", embed]
 
