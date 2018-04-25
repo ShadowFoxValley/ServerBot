@@ -63,6 +63,36 @@ class ProcessFunction():
         if check_permission(self.get_status(), "setprefix"):
             mariadb.set_prefix(new_prefix)
 
+    def give(self):
+        """
+        Установка нового префикса
+        """
+        global mariadb
+        if check_permission(self.get_status(), "give"):
+            user = self.message.mentions
+            if len(user) == 0:
+                return ["text", "Пингани хоть одного"]
+
+            msg_parts = self.message.content.replace("  ", " ").split(" ")
+            if len(msg_parts) < 3:
+                return ["text", "Ты что-то пропустил"]
+
+            mariadb.give_coin(user[0].id, int(msg_parts[2]))
+            return ["text", "Накинул %s %s пойнтов"%(user[0].mention, msg_parts[2])]
+
+    def adduser(self):
+        """
+        Добавить пользователя вручную
+        """
+        global mariadb
+        if check_permission(self.get_status(), "adduser"):
+            user = self.message.mentions
+            if len(user) == 0:
+                return ["text", "Пингани хоть одного"]
+            self.new_user(user[0])
+            return ["text", "Добавил %s в базу"%(user[0].mention)]
+
+
 
     def get_status(self):
         global mariadb
@@ -85,6 +115,9 @@ class ProcessFunction():
 
         if role == None:
             return ["text", "Я не знаю такой роли"]
+
+        if mariadb.get_points(self.user.id) < 25:
+            return ["text", "Иди работай, у тебя даже 25 пойнтов нет."]
 
         if role.name == "Аниме":
             return ["text", "Никакого аниме в мою смену"]

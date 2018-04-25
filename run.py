@@ -39,7 +39,7 @@ async def on_member_join(member):
 
 # Необходима для функционирования #event-log
 last_users = ["null" for i in range(5)]
-commands = ["test", "setprefix", "doge", "help", "points", "top", "wait", "hots", "get", "leave"]
+commands = ["test", "setprefix", "doge", "help", "points", "top", "wait", "hots", "get", "leave", "adduser", "give"]
 @client.event
 async def on_message(message):
     global prefix, mariadb, commands, last_users
@@ -100,6 +100,12 @@ async def on_message(message):
 
         elif command == "top":
                 result = process.get_top_list()
+
+        elif command == "adduser":
+                result = process.adduser()
+
+        elif command == "give":
+                result = process.give()
 
         elif command == "get":
             result = process.check_role()
