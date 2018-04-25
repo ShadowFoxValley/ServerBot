@@ -49,13 +49,13 @@ class mariadb:
         except Exception as e:
             return 1
 
-    def give_coin(self, user_id):
+    def give_coin(self, user_id, points):
         """
         Выдача коинов пользователю.
         """
         with self.db.cursor() as cursor:
-            sql = "UPDATE users SET points=points+1 WHERE discord_id=%s"
-            cursor.execute(sql, (user_id,))
+            sql = "UPDATE users SET points=points+%s WHERE discord_id=%s"
+            cursor.execute(sql, (points, user_id,))
         self.commit()
         return cursor.fetchone()
 

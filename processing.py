@@ -1,4 +1,4 @@
-from discord import Embed
+from discord import Embed, utils
 from random import shuffle, randint
 from permissions import check_permission
 
@@ -12,6 +12,8 @@ mariadb = database.mariadb(db_user, db_pass)
 Служебные команды
 Триггерятся от админов или от тела программы
 """
+
+
 class ProcessFunction():
 
     def __init__(self, message):
@@ -48,9 +50,9 @@ class ProcessFunction():
         mariadb.new_user(member)
 
 
-    def give_coin(self):
+    def give_coin(self, points):
         global mariadb
-        mariadb.give_coin(self.user.id)
+        mariadb.give_coin(self.user.id, points)
 
 
     def set_prefix(self, new_prefix):
@@ -72,6 +74,25 @@ class ProcessFunction():
         Могут использовать все
     """
 
+    names = ["hots", "настолочник", "minecraft", "riddler", "блок", "easyblock", "технарь", "lol", "антисрач", "eventblock", "voice", "fox", "lizards", "weeb", "steampunk", "panda", "cat", "meme-boy", "shadow", "аниме"]
+
+    def check_role(self):
+        """
+            Проверка роли
+        """
+        request_role = self.message.content.split(" ")[1]
+        role = utils.get(self.message.server.roles, name=request_role)
+
+        if role == None:
+            return ["text", "Я не знаю такой роли"]
+
+        if role.name == "Аниме":
+            return ["text", "Никакого аниме в мою смену"]
+
+        if role.name.lower() in self.names:
+            return ["role", role]
+        else:
+            return ["text", "Ага, щас"]
 
     def doge(self):
         """

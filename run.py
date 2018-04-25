@@ -1,7 +1,7 @@
-import discord
-import processing
+from discord import Client, utils
+from processing import ProcessFunction
 
-client = discord.Client()
+client = Client()
 
 
 """
@@ -14,7 +14,7 @@ client = discord.Client()
 async def on_message_delete(message):
     try:
         if message.channel.id == "421637061787779072":
-            await client.send_message(message.channel, embed=processing.ProcessFunction.make_deleted_message(message))
+            await client.send_message(message.channel, embed=ProcessFunction.make_deleted_message(message))
     except Exception as e:
         pass
 
@@ -26,7 +26,7 @@ async def on_message_edit(before, after):
 
     try:
         if before.channel.id == "421637061787779072":
-            await client.send_message(before.channel, embed=processing.ProcessFunction.make_edited_message(before, after))
+            await client.send_message(before.channel, embed=ProcessFunction.make_edited_message(before, after))
     except Exception as e:
         pass
 
@@ -34,12 +34,12 @@ async def on_message_edit(before, after):
 @client.event
 async def on_member_join(member):
     print("New user - {}".format(member.name))
-    processing.ProcessFunction.new_user(member)
+    ProcessFunction.new_user(member)
 
 
 # Необходима для функционирования #event-log
 last_users = ["null" for i in range(5)]
-
+commands = ["test", "setprefix", "doge", "help", "points", "top", "wait", "hots", "get", "leave"]
 @client.event
 async def on_message(message):
     global prefix, mariadb, commands, last_users
@@ -72,10 +72,10 @@ async def on_message(message):
         Command block
 
     """
-    process = processing.ProcessFunction(message)
+    process = ProcessFunction(message)
 
 
-    commands = ["test", "setprefix", "doge", "help", "points", "top", "wait"]
+
     if message_text.split(" ")[0].replace(prefix, "") in commands:
 
         command = message_text.split(" ")[0].replace(prefix, "")
@@ -99,7 +99,39 @@ async def on_message(message):
                 result = process.points()
 
         elif command == "top":
-                result = process.get_top_list(user)
+                result = process.get_top_list()
+
+        elif command == "get":
+            result = process.check_role()
+            if result[0] == "role":
+                role = result[1]
+                if role not in message.author.roles:
+                    await client.send_message(message.channel, "{}, добавить ``{}`` будет стоить 25 догекойнов. Напиши ``да``, если согласен.".format(message.author.mention, role.name))
+                    msg = await client.wait_for_message(timeout=float(7), author=message.author)
+                    if msg == None:
+                        await client.send_message(message.channel, "{}, время вышло.".format(message.author.mention))
+                    elif msg.content.lower() == "да":
+                        await client.add_roles(message.author, role)
+                        process.give_coin(-25)
+                        result=["text", "Теперь у тебя есть {}".format(role.name)]
+                else:
+                    result=["text", "У тебя уже есть эта роль."]
+
+        elif command == "leave":
+            result = process.check_role()
+            if result[0] == "role":
+                role = result[1]
+                if role in message.author.roles:
+
+                    await client.send_message(message.channel, "{}, удалить ``{}`` будет стоить 25 догекойнов. Напиши ``да``, если согласен.".format(message.author.mention, role.name))
+                    msg = await client.wait_for_message(timeout=float(7), author=message.author)
+
+                    if msg == None:
+                        await client.send_message(message.channel, "{}, время вышло.".format(message.author.mention))
+                    elif msg.content.lower() == "да":
+                        await client.remove_roles(message.author, role)
+                        process.give_coin(-25)
+                        result=["text", "Теперь у тебя нет {}".format(role.name)]
 
         elif command == "wait":
                 queue = "Вы пока что не можете писать историю:"
@@ -140,8 +172,9 @@ async def on_message(message):
         """
         msg = await client.wait_for_message(timeout=float(7), author=user)
         if msg is None:
-            process.give_coin()
+            process.give_coin(1)
 
+    del process
 
 @client.event
 async def on_ready():
@@ -150,6 +183,6 @@ async def on_ready():
     print(client.user.id)
     print('------')
 
-prefix, token = processing.ProcessFunction.get_settings()
+prefix, token = ProcessFunction.get_settings()
 
 client.run(token)
