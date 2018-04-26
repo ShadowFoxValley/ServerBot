@@ -116,7 +116,7 @@ class ProcessFunction():
         if role == None:
             return ["text", "Я не знаю такой роли"]
 
-        if mariadb.get_points(self.user.id) < 25:
+        if mariadb.get_points(self.user.id)[0] < 25:
             return ["text", "Иди работай, у тебя даже 25 пойнтов нет."]
 
         if role.name == "Аниме":

@@ -1,5 +1,6 @@
 from discord import Client, utils
 from processing import ProcessFunction
+from math import fabs
 
 client = Client()
 
@@ -22,6 +23,9 @@ async def on_message_delete(message):
 @client.event
 async def on_message_edit(before, after):
     if before.content == after.content:
+        return
+
+    if fabs(len(before.content)-len(after.content)) <=4:
         return
 
     try:
